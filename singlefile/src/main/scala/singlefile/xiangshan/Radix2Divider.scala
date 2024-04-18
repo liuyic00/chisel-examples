@@ -1,3 +1,5 @@
+/* https://github.com/OpenXiangShan/XiangShan/blob/7af6acb01d3e68a3ff29bcf1bdcfc7fe565dc89c/src/main/scala/xiangshan/backend/fu/Radix2Divider.scala */
+
 package singlefile.xiangshan.radix2divider
 
 import chisel3._
