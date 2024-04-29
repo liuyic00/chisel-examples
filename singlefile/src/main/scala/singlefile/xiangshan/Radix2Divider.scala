@@ -77,7 +77,9 @@ class Radix2Divider(len: Int) extends AbstractDivider(len) {
     //     = 64.U - (Log2(aVal, XLEN) + 1.U) + Log2(bVal, XLEN) + 1.U
     //     = 64.U + Log2(bVal, XLEN) - Log2(aVal, XLEN)
     //     = (64.U | Log2(bVal, XLEN)) - Log2(aVal, XLEN)  // since Log2(bVal, XLEN) < 64.U
-    val canSkipShift = (64.U | Log2(bReg)) - Log2(aValx2Reg)
+
+    // to allow different width, here modified from (64.U | Log2(bReg)) to (len.U + Log2(bReg))
+    val canSkipShift = (len.U + Log2(bReg)) - Log2(aValx2Reg)
     // When divide by 0, the quotient should be all 1's.
     // Therefore we can not shift in 0s here.
     // We do not skip any shift to avoid this.
