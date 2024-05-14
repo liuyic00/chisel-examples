@@ -10,8 +10,9 @@ lazy val singlefile = (project in file("singlefile"))
   .settings(
     name := "singlefile",
     libraryDependencies ++= Seq(
-      "org.chipsalliance" %% "chisel"    % chiselVersion,
-      "org.scalatest"     %% "scalatest" % "3.2.16" % "test"
+      "org.chipsalliance" %% "chisel"     % chiselVersion,
+      "org.scalatest"     %% "scalatest"  % "3.2.16" % "test",
+      "edu.berkeley.cs"   %% "chiseltest" % "6.0.0"  % "test"
     ),
     scalacOptions ++= Seq(
       "-language:reflectiveCalls",
