@@ -30,6 +30,7 @@ int main(int argc, char **argv)
     contextp->commandArgs(argc, argv);
     contextp->traceEverOn(true);
     top->trace(tracep, 0);
+    system("mkdir -p ./test_run_dir/verilator");
     tracep->open("test_run_dir/verilator/ArrayMulDataModule.vcd");
 
     int len = 64;
@@ -42,17 +43,25 @@ int main(int argc, char **argv)
     clock_down(contextp, tracep, top);
 
     top->reset = 0;
-    top->io_a = VlWide<3UL>{2, 0, 0};
-    top->io_b = VlWide<3UL>{3, 0, 0};
     top->io_regEnables_0 = 1;
     top->io_regEnables_1 = 1;
 
-    clock_up(contextp, tracep, top);
-    clock_down(contextp, tracep, top);
-    if (len >= 64)
+    int a[3] = {0};
+    int b[3] = {0};
+
+    for (int i = 0; i < 50; i++)
     {
+        a[0] = i + 2;
+        b[0] = i + 3;
+        std::copy(a, a + 3, top->io_a.m_storage);
+        std::copy(b, b + 3, top->io_b.m_storage);
         clock_up(contextp, tracep, top);
         clock_down(contextp, tracep, top);
+        if (len >= 64)
+        {
+            clock_up(contextp, tracep, top);
+            clock_down(contextp, tracep, top);
+        }
     }
 
     printf("top->io_result = %u : 6\n", top->io_result.at(0));
