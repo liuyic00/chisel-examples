@@ -14,10 +14,10 @@ gen_dir_$(1):=$$(VERILATOR_DIR)/$$(package_name_$(1))/$$(module_name_$(1))
 Vexe_$(1):=$$(gen_dir_$(1))/V$$(module_name_$(1))
 
 $$(sv_$(1)): $$(EMIT_HEADER) singlefile/src/main/scala/singlefile/$$(package_name_$(1))/$$(scala_file_name_$(1)).scala
-	sbt "singlefile/runMain singlefile.$$(module_name_$(1))Emit"
+	time sbt "singlefile/runMain singlefile.$$(module_name_$(1))Emit"
 $$(Vexe_$(1)): $$(sv_$(1)) $$(CURDIR)/singlefile/src/test/cpp/singlefile/$$(package_name_$(1))/$$(module_name_$(1)).cpp
 	mkdir -p $$(gen_dir_$(1))
-	verilator --cc --exe --build -j 0 --Mdir $$(gen_dir_$(1))/cpp --top-module $$(module_name_$(1)) -o $$@ $$^
+	time verilator --cc --exe --build -j 0 --trace --Mdir $$(gen_dir_$(1))/cpp --top-module $$(module_name_$(1)) -o $$@ $$^
 $$(name_$(1)): $$(Vexe_$(1))
 $$(name_$(1))-run: $$(Vexe_$(1))
 	time $$<
