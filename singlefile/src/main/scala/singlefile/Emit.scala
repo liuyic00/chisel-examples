@@ -1,7 +1,7 @@
 package singlefile
 
 object ArrayMulDataModuleEmit extends App {
-  val width = args(0).toInt
+  val width = 64
 
   import xiangshan.multiplier.ArrayMulDataModule
 

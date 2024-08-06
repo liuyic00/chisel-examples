@@ -1,65 +1,31 @@
 
-EMIT_HEADER:=singlefile/src/main/scala/singlefile/Emit.scala build.sbt
+EMIT_HEADER:=./singlefile/src/main/scala/singlefile/Emit.scala ./build.sbt
 VERILOG_DIR:=$(CURDIR)/build/verilog
 VERILATOR_DIR:=$(CURDIR)/build/verilator
 
-# xiangshanMul
-name:=xiangshanMul
-sv:=$(VERILOG_DIR)/xiangshan/ArrayMulDataModule.sv
-gen_dir:=$(VERILATOR_DIR)/xiangshan/ArrayMulDataModule
-Vexe:=$(xiangshanMul_gen_dir)/VArrayMulDataModule
+define create_target
+name_$(1):=$(1)
+package_name_$(1):=$(2)
+scala_file_name_$(1):=$(3)
+module_name_$(1):=$(4)
 
-$(sv): $(EMIT_HEADER) singlefile/src/main/scala/singlefile/xiangshan/Multiplier.scala
-	sbt "singlefile/runMain singlefile.ArrayMulDataModuleEmit 64"
+sv_$(1):=$$(VERILOG_DIR)/$$(package_name_$(1))/$$(module_name_$(1)).sv
+gen_dir_$(1):=$$(VERILATOR_DIR)/$$(package_name_$(1))/$$(module_name_$(1))
+Vexe_$(1):=$$(gen_dir_$(1))/V$$(module_name_$(1))
 
-$(Vexe): $(sv) singlefile/src/test/cpp/singlefile/xiangshan/ArrayMulDataModule.cpp
-	mkdir -p $(gen_dir)
-	verilator --cc --exe --build -j 0 --Mdir $(gen_dir)/cpp --top-module ArrayMulDataModule -o $@ $^
+$$(sv_$(1)): $$(EMIT_HEADER) singlefile/src/main/scala/singlefile/$$(package_name_$(1))/$$(scala_file_name_$(1)).scala
+	sbt "singlefile/runMain singlefile.$$(module_name_$(1))Emit"
+$$(Vexe_$(1)): $$(sv_$(1)) $$(CURDIR)/singlefile/src/test/cpp/singlefile/$$(package_name_$(1))/$$(module_name_$(1)).cpp
+	mkdir -p $$(gen_dir_$(1))
+	verilator --cc --exe --build -j 0 --Mdir $$(gen_dir_$(1))/cpp --top-module $$(module_name_$(1)) -o $$@ $$^
+$$(name_$(1)): $$(Vexe_$(1))
+$$(name_$(1))-run: $$(Vexe_$(1))
+	time $$<
+endef
 
-$(name): $(Vexe)
-
-$(name)-run: $(Vexe)
-	time ./$<
-
-
-# xiangshanDiv
-name:=xiangshanDiv
-package_name:=xiangshan
-scala_file_name:=Radix2Divider
-module_name:=Radix2Divider
-
-sv:=$(VERILOG_DIR)/$(package_name)/$(module_name).sv
-gen_dir:=$(VERILATOR_DIR)/$(package_name)/$(module_name)
-Vexe:=$(gen_dir)/V$(module_name)
-
-$(sv): $(EMIT_HEADER) singlefile/src/main/scala/singlefile/$(package_name)/$(scala_file_name).scala
-	sbt "singlefile/runMain singlefile.$(module_name)Emit"
-$(Vexe): $(sv) singlefile/src/test/cpp/singlefile/$(package_name)/$(module_name).cpp
-	mkdir -p $(gen_dir)
-	verilator --cc --exe --build -j 0 --Mdir $(gen_dir)/cpp --top-module $(module_name) -o $@ $^
-$(name): $(Vexe)
-$(name)-run: $(Vexe)
-	time ./$<
-
-
-# adder
-name:=adder
-package_name:=basic/alu
-scala_file_name:=Adder
-module_name:=Adder
-
-sv:=$(VERILOG_DIR)/$(package_name)/$(module_name).sv
-gen_dir:=$(VERILATOR_DIR)/$(package_name)/$(module_name)
-Vexe:=$(gen_dir)/V$(module_name)
-
-$(sv): $(EMIT_HEADER) singlefile/src/main/scala/singlefile/$(package_name)/$(scala_file_name).scala
-	sbt "singlefile/runMain singlefile.$(module_name)Emit"
-$(Vexe): $(sv) $(CURDIR)/singlefile/src/test/cpp/singlefile/$(package_name)/$(module_name).cpp
-	mkdir -p $(gen_dir)
-	verilator --cc --exe --build -j 0 --Mdir $(gen_dir)/cpp --top-module $(module_name) -o $@ $^
-$(name): $(Vexe)
-$(name)-run: $(Vexe)
-	time ./$<
+$(eval $(call create_target,adder,basic/alu,Adder,Adder))
+$(eval $(call create_target,xiangshanDiv,xiangshan,Radix2Divider,Radix2Divider))
+$(eval $(call create_target,xiangshanMul,xiangshan,Multiplier,ArrayMulDataModule))
 
 clear:
 	rm -rf build
