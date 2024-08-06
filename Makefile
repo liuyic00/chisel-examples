@@ -1,7 +1,7 @@
 
 EMIT_HEADER:=singlefile/src/main/scala/singlefile/Emit.scala build.sbt
-VERILOG_DIR:=build/verilog
-VERILATOR_DIR:=build/verilator
+VERILOG_DIR:=$(CURDIR)/build/verilog
+VERILATOR_DIR:=$(CURDIR)/build/verilator
 
 # xiangshanMul
 name:=xiangshanMul
@@ -14,7 +14,7 @@ $(sv): $(EMIT_HEADER) singlefile/src/main/scala/singlefile/xiangshan/Multiplier.
 
 $(Vexe): $(sv) singlefile/src/test/cpp/singlefile/xiangshan/ArrayMulDataModule.cpp
 	mkdir -p $(gen_dir)
-	verilator --cc --exe --build -j 0 -Wall --Mdir $(gen_dir)/cpp --top-module ArrayMulDataModule -o $@ $^
+	verilator --cc --exe --build -j 0 --Mdir $(gen_dir)/cpp --top-module ArrayMulDataModule -o $@ $^
 
 $(name): $(Vexe)
 
@@ -36,7 +36,7 @@ $(sv): $(EMIT_HEADER) singlefile/src/main/scala/singlefile/$(package_name)/$(sca
 	sbt "singlefile/runMain singlefile.$(module_name)Emit"
 $(Vexe): $(sv) singlefile/src/test/cpp/singlefile/$(package_name)/$(module_name).cpp
 	mkdir -p $(gen_dir)
-	verilator --cc --exe --build -j 0 -Wall --Mdir $(gen_dir)/cpp --top-module $(module_name) -o $@ $^
+	verilator --cc --exe --build -j 0 --Mdir $(gen_dir)/cpp --top-module $(module_name) -o $@ $^
 $(name): $(Vexe)
 $(name)-run: $(Vexe)
 	time ./$<
@@ -56,7 +56,7 @@ $(sv): $(EMIT_HEADER) singlefile/src/main/scala/singlefile/$(package_name)/$(sca
 	sbt "singlefile/runMain singlefile.$(module_name)Emit"
 $(Vexe): $(sv) $(CURDIR)/singlefile/src/test/cpp/singlefile/$(package_name)/$(module_name).cpp
 	mkdir -p $(gen_dir)
-	verilator --cc --exe --build -j 0 -Wall --Mdir $(gen_dir)/cpp --top-module $(module_name) -o $@ $^
+	verilator --cc --exe --build -j 0 --Mdir $(gen_dir)/cpp --top-module $(module_name) -o $@ $^
 $(name): $(Vexe)
 $(name)-run: $(Vexe)
 	time ./$<
