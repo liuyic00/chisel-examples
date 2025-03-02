@@ -7,6 +7,11 @@ object ArrayMulDataModuleEmit extends App {
 
   import _root_.circt.stage.ChiselStage
 
+  val fir       = ChiselStage.emitCHIRRTL(new ArrayMulDataModule(width + 1))
+  val writerfir = new java.io.PrintWriter(new java.io.File("build/verilog/xiangshan", s"ArrayMulDataModule.fir"))
+  try writerfir.write(fir)
+  finally writerfir.close()
+
   val verilogFile   = new java.io.File("build/verilog/xiangshan", s"ArrayMulDataModule.sv")
   val verilogString = ChiselStage.emitSystemVerilog(new ArrayMulDataModule(width + 1))
 
