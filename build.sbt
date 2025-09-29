@@ -1,18 +1,17 @@
 // See README.md for license details.
 
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "2.13.16"
 ThisBuild / version      := "0.1.0"
-ThisBuild / organization := "com.liuyic00"
+ThisBuild / organization := "io.github.liuyic00"
 
-val chiselVersion = "6.2.0"
+val chiselVersion = "7.1.1"
 
-lazy val singlefile = (project in file("singlefile"))
+lazy val root = (project in file("."))
   .settings(
-    name := "singlefile",
+    name := "Examples",
     libraryDependencies ++= Seq(
-      "org.chipsalliance" %% "chisel"     % chiselVersion,
-      "org.scalatest"     %% "scalatest"  % "3.2.16" % "test",
-      "edu.berkeley.cs"   %% "chiseltest" % "6.0.0"  % "test"
+      "org.chipsalliance" %% "chisel"    % chiselVersion,
+      "org.scalatest"     %% "scalatest" % "3.2.19" % "test"
     ),
     scalacOptions ++= Seq(
       "-language:reflectiveCalls",
@@ -21,5 +20,7 @@ lazy val singlefile = (project in file("singlefile"))
       "-Xcheckinit",
       "-Ymacro-annotations"
     ),
-    addCompilerPlugin("org.chipsalliance" % "chisel-plugin" % chiselVersion cross CrossVersion.full)
+    addCompilerPlugin(
+      "org.chipsalliance" % "chisel-plugin" % chiselVersion cross CrossVersion.full
+    )
   )
